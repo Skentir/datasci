@@ -32,8 +32,10 @@ class CollaborativeFiltering(object):
         # DataFrame. Return the mean of the Series if the parameter data is a
         # Series.
         # Hint: Use pandas.DataFrame.mean() or pandas.Series.mean() functions.
-        
-        return data.mean(axis=0,skipna = True)
+        if isinstance(data,pd.DataFrame):
+            return data.mean(axis=1,skipna = True)
+        else:
+            return data.mean(skipna=True)
 
     def normalize_data(self, data, row_mean):
         """Returns the data normalized by subtracting the row mean.
@@ -61,7 +63,7 @@ class CollaborativeFiltering(object):
         # HINT: Use pandas.DataFrame.subtract() or pandas.Series.subtract()
         # functions.
         if isinstance(data, pd.DataFrame) and isinstance(row_mean, pd.Series):
-            return data.subtract(row_mean, axis=1)
+            return data.subtract(row_mean, axis=0)
         elif isinstance(data, pd.Series) and isinstance(row_mean, np.float64):
             return data.subtract(row_mean, fill_value=0)
 
@@ -173,9 +175,7 @@ class CollaborativeFiltering(object):
         sim = self.get_k_similar(new_data, vector)
         # TODO: Compute for the rating using the similarity values and the raw
         # ratings for the k similar items.
-        rating = 0
-        for i in sim[0]:
-            rating += i * new_data.iloc[i][column]
-            i -= 1
-        rating /= sim[1].sum()
+      
+        rating = np.sum([x * new_data.iloc[i][column] for i in  sim[0] for x in sim[1]])/sim[1].sum()
+  
         return rating 
