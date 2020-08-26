@@ -35,7 +35,7 @@ class CollaborativeFiltering(object):
         if isinstance(data,pd.DataFrame):
             return data.mean(axis=1,skipna = True)
         else:
-            return data.mean(skipna=True)
+            return np.float64(data.mean(skipna=True))
 
     def normalize_data(self, data, row_mean):
         """Returns the data normalized by subtracting the row mean.
@@ -65,7 +65,7 @@ class CollaborativeFiltering(object):
         if isinstance(data, pd.DataFrame) and isinstance(row_mean, pd.Series):
             return data.subtract(row_mean, axis=0)
         elif isinstance(data, pd.Series) and isinstance(row_mean, np.float64):
-            return data.subtract(row_mean, fill_value=0)
+            return data.subtract(row_mean)
 
     def get_cosine_similarity(self, vector1, vector2):
         """Returns the cosine similarity between two vectors. These vectors can
@@ -107,7 +107,7 @@ class CollaborativeFiltering(object):
                 cos.append(ans)
             return pd.Series(cos)
         else:
-            return np.nansum(vector1*vector2)/(np.sqrt(np.nansum([i**2 for i in vector1]))* np.sqrt(np.nansum([i**2 for i in vector2])))    
+            return np.float64(np.nansum(vector1*vector2)/(np.sqrt(np.nansum([i**2 for i in vector1]))* np.sqrt(np.nansum([i**2 for i in vector2]))))
 
     def get_k_similar(self, data, vector):
         """Returns two values - the indices of the top k similar items to the
@@ -131,11 +131,16 @@ class CollaborativeFiltering(object):
         # class
         means = self.get_row_mean(data)
         norm = self.normalize_data(data, means)
+       
+        means2 = self.get_row_mean(vector)
+        vector = self.normalize_data(vector,means2)
+     
         # TODO: Get the cosine similarity between the normalized data and
         # vector
         # HINT: Use the get_cosine_similarity() function that we have defined
         # in this class
-        res = self.get_cosine_similarity(vector,norm)  
+        res = self.get_cosine_similarity(vector,norm)
+       
         # TODO: Get the INDICES of the top k most similar items based on
         # the cosine similarity values
         # HINT: Use pandas.Series.nlargest() function.
