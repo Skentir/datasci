@@ -175,7 +175,8 @@ class CollaborativeFiltering(object):
         sim = self.get_k_similar(new_data, vector)
         # TODO: Compute for the rating using the similarity values and the raw
         # ratings for the k similar items.
-      
-        rating = np.sum([x * new_data.iloc[i][column] for i in  sim[0] for x in sim[1]])/sim[1].sum()
+        
+             
+        rating = (np.sum([x * new_data.iloc[i][column] for i in  sim[0] for x in sim[1]])/2)/sim[1].sum()
   
         return rating 
